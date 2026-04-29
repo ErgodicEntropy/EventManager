@@ -1,0 +1,33 @@
+<body class="p-6 bg-gray-100">
+
+<h1 class="text-xl mb-4">My Created Events</h1>
+
+<div id="events"></div>
+
+<script>
+fetch('../backend/my_created_events.php')
+.then(res => res.json())
+.then(events => {
+    let container = document.getElementById('events');
+
+    events.forEach(e => {
+        container.innerHTML += `
+            <div class="bg-white p-4 mb-3 rounded shadow">
+                <h2 class="font-bold">${e.title}</h2>
+                <button onclick="deleteEvent(${e.id})"
+                    class="bg-red-500 text-white px-2 py-1 mt-2">
+                    Delete
+                </button>
+            </div>
+        `;
+    });
+});
+
+function deleteEvent(id) {
+    fetch('../backend/delete_event.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'event_id=' + id
+    }).then(res => res.text()).then(alert);
+}
+</script>

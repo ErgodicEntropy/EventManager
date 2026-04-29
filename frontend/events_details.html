@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-6">
+
+<div class="max-w-2xl mx-auto bg-white p-6 rounded shadow">
+
+  <h1 id="title" class="text-2xl font-bold"></h1>
+  <p id="description" class="mt-3 text-gray-600"></p>
+
+  <div class="mt-4 text-sm text-gray-400">
+    <p id="location"></p>
+    <p id="date"></p>
+  </div>
+
+  <button id="registerBtn"
+    class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
+    Join Event
+  </button>
+
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const id = params.get('id');
+
+fetch(`../backend/get_event.php?id=${id}`)
+.then(res => res.json())
+.then(e => {
+    document.getElementById('title').innerText = e.title;
+    document.getElementById('description').innerText = e.description;
+    document.getElementById('location').innerText = "📍 " + e.location;
+    document.getElementById('date').innerText = "🗓 " + e.date;
+});
+
+document.getElementById('registerBtn').onclick = () => {
+    fetch('../backend/register_event.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'event_id=' + id
+    }).then(res => res.text()).then(alert);
+};
+</script>
+
+</body>
+</html>

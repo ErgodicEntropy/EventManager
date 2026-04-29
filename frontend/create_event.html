@@ -3,18 +3,35 @@
 <head>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="p-6">
+<body class="bg-gray-100">
 
-<form action="../backend/create_event.php" method="POST" class="max-w-lg mx-auto">
-    <h2 class="text-xl mb-4">Create Event</h2>
+<nav class="bg-white shadow-md p-4">
+  <h1 class="text-xl font-bold text-blue-600">Create Event</h1>
+</nav>
 
-    <input name="title" placeholder="Title" class="w-full mb-2 p-2 border">
-    <textarea name="description" class="w-full mb-2 p-2 border"></textarea>
-    <input type="datetime-local" name="date" class="w-full mb-2 p-2 border">
-    <input name="location" placeholder="Location" class="w-full mb-2 p-2 border">
+<div class="max-w-lg mx-auto mt-6">
 
-    <button class="bg-green-500 text-white px-4 py-2">Create</button>
+<form action="../backend/create_event.php" method="POST"
+      class="bg-white p-6 rounded-xl shadow">
+
+  <input name="title" placeholder="Event Title"
+         class="w-full mb-3 p-3 border rounded">
+
+  <textarea name="description" placeholder="Description"
+            class="w-full mb-3 p-3 border rounded"></textarea>
+
+  <input type="datetime-local" name="date"
+         class="w-full mb-3 p-3 border rounded">
+
+  <input name="location" placeholder="Location"
+         class="w-full mb-3 p-3 border rounded">
+
+  <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+    Create Event
+  </button>
+
 </form>
 
+</div>
 </body>
 </html>

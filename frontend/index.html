@@ -1,42 +1,157 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <title>Eventify - Events</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="p-6">
 
-<h1 class="text-2xl mb-4">Events</h1>
+<body class="bg-gray-100 min-h-screen">
 
-<div id="events" class="space-y-3"></div>
+<!-- Navbar -->
+<nav class="bg-white shadow-md px-6 py-4 flex justify-between items-center">
+  <h1 class="text-xl font-bold text-blue-600">Eventify</h1>
+
+  <div class="space-x-4">
+    <a href="index.html" class="text-gray-700 hover:text-blue-500">Events</a>
+    <a href="create_event.html" class="text-gray-700 hover:text-blue-500">Create</a>
+    <a href="login.html" class="text-gray-700 hover:text-blue-500">Login</a>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="max-w-6xl mx-auto px-4 mt-8">
+
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-semibold">Upcoming Events</h2>
+
+    <!-- Search -->
+    <input id="search"
+      type="text"
+      placeholder="Search events..."
+      class="border p-2 rounded w-64">
+  </div>
+
+  <!-- Loading -->
+  <div id="loading" class="text-gray-500">Loading events...</div>
+
+  <!-- Events Grid -->
+  <div id="events"
+       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div id="toast"
+     class="fixed bottom-5 right-5 bg-black text-white px-4 py-2 rounded hidden">
+</div>
 
 <script>
+let allEvents = [];
+
+// Fetch events
 fetch('../backend/get_events.php')
 .then(res => res.json())
 .then(events => {
-    let container = document.getElementById('events');
+    allEvents = events;
 
-    events.forEach(e => {
-        container.innerHTML += `
-            <div class="border p-4">
-                <h2 class="text-lg">${e.title}</h2>
-                <p>${e.description}</p>
-                <button onclick="register(${e.id})"
-                    class="bg-blue-500 text-white px-2 py-1 mt-2">
-                    Register
-                </button>
-            </div>
-        `;
-    });
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('events').classList.remove('hidden');
+
+    renderEvents(events);
 });
 
-function register(id) {
+// Render function
+function renderEvents(events) {
+    const container = document.getElementById('events');
+    container.innerHTML = '';
+
+    if (!events.length) {
+        container.innerHTML = "<p class='text-gray-500'>No events found</p>";
+        return;
+    }
+
+    events.forEach(e => {
+        const card = document.createElement('div');
+
+        card.className =
+          "bg-white p-5 rounded-xl shadow hover:shadow-lg transition";
+
+        card.innerHTML = `
+            <h3 class="text-lg font-bold text-blue-600">${e.title}</h3>
+
+            <p class="text-gray-600 mt-2 line-clamp-3">
+              ${e.description}
+            </p>
+
+            <div class="mt-3 text-sm text-gray-400">
+              <p>📍 ${e.location}</p>
+              <p>🗓 ${formatDate(e.date)}</p>
+            </div>
+
+            <button onclick="register(${e.id}, this)"
+                class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded transition">
+                Join Event
+            </button>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+// Register
+function register(id, btn) {
+    btn.disabled = true;
+    btn.innerText = "Joining...";
+
     fetch('../backend/register_event.php', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: 'event_id=' + id
     })
     .then(res => res.text())
-    .then(alert);
+    .then(msg => {
+        showToast(msg);
+
+        btn.innerText = "Joined";
+        btn.classList.remove('bg-blue-500');
+        btn.classList.add('bg-green-500');
+    })
+    .catch(() => {
+        btn.disabled = false;
+        btn.innerText = "Join Event";
+        showToast("Error occurred");
+    });
+}
+
+// Search
+document.getElementById('search').addEventListener('input', e => {
+    const value = e.target.value.toLowerCase();
+
+    const filtered = allEvents.filter(ev =>
+        ev.title.toLowerCase().includes(value) ||
+        ev.description.toLowerCase().includes(value)
+    );
+
+    renderEvents(filtered);
+});
+
+// Toast
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.innerText = msg;
+    toast.classList.remove('hidden');
+
+    setTimeout(() => {
+        toast.classList.add('hidden');
+    }, 3000);
+}
+
+// Format date
+function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    return date.toLocaleString();
 }
 </script>
 

@@ -5,10 +5,13 @@
 </head>
 <body class="bg-gray-100 flex items-center justify-center h-screen">
 
-<form action="../backend/login.php" method="POST"
+<form action="../backend/register.php" method="POST"
       class="bg-white p-8 rounded-xl shadow-md w-96">
 
-  <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
+  <h2 class="text-2xl font-bold mb-6 text-center">Register</h2>
+
+  <input name="name" placeholder="Name"
+         class="w-full mb-4 p-3 border rounded">
 
   <input name="email" type="email" placeholder="Email"
          class="w-full mb-4 p-3 border rounded">
@@ -16,13 +19,9 @@
   <input name="password" type="password" placeholder="Password"
          class="w-full mb-4 p-3 border rounded">
 
-  <button class="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600">
-    Login
+  <button class="w-full bg-green-500 text-white p-3 rounded hover:bg-green-600">
+    Create Account
   </button>
-
-  <p class="text-sm mt-4 text-center">
-    No account? <a href="register.html" class="text-blue-500">Register</a>
-  </p>
 
 </form>
 </body>

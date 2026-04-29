@@ -1,0 +1,22 @@
+<body class="p-6 bg-gray-100">
+
+<h1 class="text-xl mb-4">My Events</h1>
+
+<div id="events"></div>
+
+<script>
+fetch('../backend/my_events.php')
+.then(res => res.json())
+.then(events => {
+    let container = document.getElementById('events');
+
+    events.forEach(e => {
+        container.innerHTML += `
+            <div class="bg-white p-4 mb-3 rounded shadow">
+                <h2 class="font-bold">${e.title}</h2>
+                <p>${e.description}</p>
+            </div>
+        `;
+    });
+});
+</script>
