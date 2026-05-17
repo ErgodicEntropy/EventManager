@@ -1,31 +1,61 @@
 <?php
+
+// Represents any platform user (attendee/participant, organizer, admin). Stores identity info, roles, and registered events.
+
 class User {
-    private $conn;
+    public int $id;
+    public string $name;
+    public string $type; // participant, organizer or admin (role)
+    public string $email;
+    public array $registeredEvents = [];
 
-    public function __construct($db) {
-        $this->conn = $db;
+    public function __construct(int $id, string $name, string $email, bool $isOrganizer = false, string $type) {
+        $this->id = $id;
+        $this->name = $name;
+        $this->email = $email;
+        $this->type = $type; 
     }
 
-    public function register($name, $email, $password) {
-        $hashed = password_hash($password, PASSWORD_DEFAULT);
-
-        $stmt = $this->conn->prepare(
-            "INSERT INTO users (name, email, password) VALUES (?, ?, ?)"
-        );
-        return $stmt->execute([$name, $email, $hashed]);
-    }
-
-    public function login($email, $password) {
-        $stmt = $this->conn->prepare(
-            "SELECT * FROM users WHERE email = ?"
-        );
-        $stmt->execute([$email]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($user && password_verify($password, $user['password'])) {
-            return $user;
+    public function registerForEvent(Event $event): void {
+        if (!in_array($event, $this->registeredEvents, true)) {
+            $this->registeredEvents[] = $event;
+            $event->registerUser($this);
         }
-        return false;
     }
+
+    public function cancelEvent(Event $event): void {
+        $this->registeredEvents = array_filter(
+            $this->registeredEvents,
+            fn($e) => $e->id !== $event->id
+        );
+
+        $event->cancelRegistration($this);
+    }
+
+    public function getUpcomingEvents(): array {
+        return $this->registeredEvents;
+    }
+
+    public function _destruct(){
+        echo "User destroyed!";
+        return; 
+    }
+
 }
+
+
+class Participant extends User{ 
+
+}
+
+class Organizer extends User{ 
+
+}
+
+class Admin extends User{ 
+
+}
+
+
+
 ?>

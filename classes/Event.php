@@ -1,22 +1,96 @@
 <?php
+
+// Central entity representing an online or offline event, including title, schedule, capacity, and linked participants.
 class Event {
-    private $conn;
+    public int $id;
+    public string $title;
+    public string $description;
+    public DateTime $startDate;
+    public DateTime $endDate;
+    public User $organizer;
+    public int $capacity;
 
-    public function __construct($db) {
-        $this->conn = $db;
+    public array $attendees = [];
+    public array $tickets = [];
+
+    // Represents where the event takes place. 
+    // For online platforms, this may be a Zoom/Meet link, streaming room, or hosted virtual space.
+
+    public array $venue = []; //an associative array containing $name, $address, $capacity, $isAvailable;
+
+    
+    public function __construct(
+        int $id,
+        string $title,
+        string $description,
+        DateTime $startDate,
+        DateTime $endDate,
+        User $organizer,
+        int $capacity
+    ) {
+        $this->id = $id;
+        $this->title = $title;
+        $this->description = $description;
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
+        $this->organizer = $organizer;
+        $this->capacity = $capacity;
     }
 
-    public function create($title, $desc, $date, $location, $organizer_id) {
-        $stmt = $this->conn->prepare(
-            "INSERT INTO events (title, description, date, location, organizer_id)
-             VALUES (?, ?, ?, ?, ?)"
+    public function setVenue(string $name, string $address, int $capacity, bool $isAvailable): void {
+        $arr = Array("name"=>$name, "address"=>$address, "capacity"=>$capacity, "isAvailable"=>$isAvailable); 
+        $this->venue = $arr;
+    }
+
+    public function isFull(): bool {
+        return count($this->attendees) >= $this->capacity;
+    }
+
+    public function getRemainingSeats(): int {
+        return $this->capacity - count($this->attendees);
+    }
+
+    public function registerUser(User $user): void {
+        if ($this->isFull()) {
+            return;
+        }
+
+        foreach ($this->attendees as $attendee) {
+            if ($attendee->id === $user->id) {
+                return;
+            }
+        }
+
+        $this->attendees[] = $user;
+    }
+
+    public function cancelRegistration(User $user): void {
+        $this->attendees = array_filter(
+            $this->attendees,
+            fn($u) => $u->id !== $user->id
         );
-        return $stmt->execute([$title, $desc, $date, $location, $organizer_id]);
     }
 
-    public function getAll() {
-        $stmt = $this->conn->query("SELECT * FROM events ORDER BY date ASC");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    public function addTicket(Ticket $ticket): void {
+        $this->tickets[] = $ticket;
+    }
+
+    public function canHost(): bool {
+        return $this->venue["isAvailable"] && $this->venue["capacity"] <= $this->capacity;
+    }
+
+    public function reserveVenue(): void {
+        $this->venue["isAvailable"] = false;
+    }
+
+    public function releaseVenue(): void {
+        $this->venue["isAvailable"] = true;
+    }
+
+    public function _destruct(){
+        echo "Event destroyed!";
+        return; 
     }
 }
+
 ?>
