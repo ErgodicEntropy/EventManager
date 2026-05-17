@@ -5,8 +5,9 @@ class Event {
     public int $id;
     public string $title;
     public string $description;
-    public DateTime $startDate;
-    public DateTime $endDate;
+    public string $category; // Tech, Music, Business, Education
+    protected DateTime $startDate;
+    protected DateTime $endDate;
     public User $organizer;
     public int $capacity;
 
@@ -16,13 +17,14 @@ class Event {
     // Represents where the event takes place. 
     // For online platforms, this may be a Zoom/Meet link, streaming room, or hosted virtual space.
 
-    public array $venue = []; //an associative array containing $name, $address, $capacity, $isAvailable;
+    protected array $venue = []; //an associative array containing $name, $address, $capacity, $isAvailable;
 
     
     public function __construct(
         int $id,
         string $title,
         string $description,
+        string $category,
         DateTime $startDate,
         DateTime $endDate,
         User $organizer,
@@ -31,6 +33,7 @@ class Event {
         $this->id = $id;
         $this->title = $title;
         $this->description = $description;
+        $this->category = $category;
         $this->startDate = $startDate;
         $this->endDate = $endDate;
         $this->organizer = $organizer;
