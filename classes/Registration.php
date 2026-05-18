@@ -6,19 +6,13 @@
         public int $eventId;
         public string $status; //confirmed, cancelled, waiting list 
         public string $ticketType; //free, VIP, paid
-        public array $waitingList; //stores user when an event is full
 
-        public function _construct($userId, $eventId, $status, $waitingList){
+        public function _construct($userId, $eventId, $status, $ticketType){
             $this->userId = $userId; 
             $this->eventId = $eventId;
             $this->status = $status; 
-            $this->waitingList = $waitingList;
+            $this->ticketType = $ticketType; 
         }
-
-        public function addToWaitingList($userId): void{
-            
-        }
-
 
         public function _destruct(){
             echo "Registration destroyed!";
