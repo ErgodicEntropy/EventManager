@@ -19,7 +19,9 @@ class Event {
 
     protected array $venue = []; //an associative array containing $name, $address, $capacity, $isAvailable;
 
-    
+    public array $reviews = []; 
+    public array $rates = []; 
+
     public function __construct(
         int $id,
         string $title,
@@ -88,6 +90,26 @@ class Event {
 
     public function releaseVenue(): void {
         $this->venue["isAvailable"] = true;
+    }
+
+    public function addReview(string $feedback): void{
+        $this->reviews[] = $feedback; 
+    }
+
+    public function addRate(int $rate): void{
+        $this->rates[] = $rate; 
+    }
+
+    public function getRate(): int{
+        $val;
+        foreach ($this->rates as $rate){
+            $val+=$rate;
+        }
+        return $val/count($this->rates);
+    }
+
+    public function getReviews(): array{
+        return $this->reviews;
     }
 
     public function _destruct(){
