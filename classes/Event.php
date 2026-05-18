@@ -11,7 +11,8 @@ class Event {
     public User $organizer;
     public int $capacity;
 
-    public array $attendees = [];
+    public array $registeredUsers = []; //merely registered
+    public array $presentUsers = []; //actually attended
     public array $tickets = [];
 
     // Represents where the event takes place. 
@@ -42,17 +43,55 @@ class Event {
         $this->capacity = $capacity;
     }
 
+    public function checkInUser(User $user): void { //convert user from an attendee (registered) to present
+        foreach ($this->registeredUsers as $registeredUser) {
+            if ($registeredUser->id === $user->id) {
+
+                // avoid duplicates
+                foreach ($this->presentUsers as $presentUser) {
+                    if ($presentUser->id === $user->id) {
+                        return;
+                    }
+                }
+
+                $this->presentUsers[] = $user;
+                return;
+            }
+        }
+    }
+
+    public function getRevenue(): float {
+        $total = 0;
+
+        foreach ($this->tickets as $ticket) {
+            $total += $ticket->price;
+        }
+
+        return $total;
+    }
+
+    public function getAttendanceRate(): float {
+
+        $registered = count($this->registeredUsers);
+
+        if ($registered === 0) {
+            return 0;
+        }
+
+        return (count($this->presentUsers) / $registered) * 100;
+    }
+
     public function setVenue(string $name, string $address, int $capacity, bool $isAvailable): void {
         $arr = Array("name"=>$name, "address"=>$address, "capacity"=>$capacity, "isAvailable"=>$isAvailable); 
         $this->venue = $arr;
     }
 
     public function isFull(): bool {
-        return count($this->attendees) >= $this->capacity;
+        return count($this->registeredUsers) >= $this->capacity;
     }
 
     public function getRemainingSeats(): int {
-        return $this->capacity - count($this->attendees);
+        return $this->capacity - count($this->registeredUsers);
     }
 
     public function registerUser(User $user): void {
@@ -60,18 +99,18 @@ class Event {
             return;
         }
 
-        foreach ($this->attendees as $attendee) {
-            if ($attendee->id === $user->id) {
+        foreach ($this->registeredUsers as $registeredUser) {
+            if ($registeredUser->id === $user->id) {
                 return;
             }
         }
 
-        $this->attendees[] = $user;
+        $this->registeredUsers[] = $user;
     }
 
     public function cancelRegistration(User $user): void {
-        $this->attendees = array_filter(
-            $this->attendees,
+        $this->registeredUsers = array_filter(
+            $this->registeredUsers,
             fn($u) => $u->id !== $user->id
         );
     }

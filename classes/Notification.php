@@ -12,9 +12,7 @@
             $this->time = $time;
         }
 
-
-
-
+        
         public function _destruct(){
             echo "Notification destroyed!";
             return;

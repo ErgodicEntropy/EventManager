@@ -5,7 +5,6 @@
 class EventManager {
     private array $events = [];
     private array $users = [];
-    private array $analytics = [];
 
     public function createEvent(Event $event): void {
         $this->events[] = $event;
@@ -68,6 +67,44 @@ class EventManager {
 
     public function getAllEvents(): array {
         return $this->events;
+    }
+
+    //Analytics
+    
+    public function getTotalRegistrations(): int {
+        $total = 0;
+
+        foreach ($this->events as $event) {
+            $total += count($event->attendees);
+        }
+
+        return $total;
+    }
+
+    public function getTotalRevenue(): float {
+        $total = 0;
+
+        foreach ($this->events as $event) {
+            $total += $event->getRevenue();
+        }
+
+        return $total;
+    }
+
+    public function getGlobalAttendanceRate(): float {
+        $registered = 0;
+        $present = 0;
+
+        foreach ($this->events as $event) {
+            $registered += count($event->attendees);
+            $present += count($event->presentUsers);
+        }
+
+        if ($registered === 0) {
+            return 0;
+        }
+
+        return ($present / $registered) * 100;
     }
 
     public function _destruct(){
