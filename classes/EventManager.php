@@ -1,20 +1,11 @@
 <?php
 
-// Handles business logic such as creating events, registering users, searching events, and enforcing rules.
-
-
-// Registration
-// Links a User to an Event, tracking status (confirmed, cancelled, waiting list).
-// WaitingList
-// Stores users when an event is full.
-// Attendance
-// Tracks actual participation (especially for online check-ins).
-// CheckInService
-// Handles marking attendance when a user joins an online session.
+// Handles business logic such as creating events, registering users, searching events, doing analytics on event performance, and enforcing rules.
 
 class EventManager {
     private array $events = [];
     private array $users = [];
+    private array $analytics = [];
 
     public function createEvent(Event $event): void {
         $this->events[] = $event;

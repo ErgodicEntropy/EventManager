@@ -22,7 +22,7 @@ class Event {
     public array $reviews = []; 
     public array $rates = []; 
 
-    public function __construct(
+    public function _construct(
         int $id,
         string $title,
         string $description,
