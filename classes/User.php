@@ -6,6 +6,7 @@ class User {
     public int $id;
     public string $name;
     public string $type; // participant, organizer or admin (role)
+    public Ticket $ticket; // 
     public string $email;
     public array $registeredEvents = [];
     public array $favoriteEvents = []; 
@@ -25,12 +26,16 @@ class User {
     }
 
     public function cancelEvent(Event $event): void {
-        $this->registeredEvents = array_filter(
-            $this->registeredEvents,
-            fn($e) => $e->id !== $event->id
-        );
-
-        $event->cancelRegistration($this);
+        if (in_array($event, $this->registeredEvents)){
+            $this->registeredEvents = array_filter(
+                $this->registeredEvents,
+                fn($e) => $e->id !== $event->id
+            );
+    
+            $event->cancelRegistration($this);
+            return; 
+        }
+        return; 
     }
 
     public function getUpcomingEvents(): array {
@@ -56,20 +61,5 @@ class User {
     }
 
 }
-
-
-class Participant extends User{ 
-
-}
-
-class Organizer extends User{ 
-
-}
-
-class Admin extends User{ 
-
-}
-
-
 
 ?>

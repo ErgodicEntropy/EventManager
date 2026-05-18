@@ -5,6 +5,7 @@
         public int $userId; 
         public int $eventId;
         public string $status; //confirmed, cancelled, waiting list 
+        public string $ticketType; //free, VIP, paid
         public array $waitingList; //stores user when an event is full
 
         public function _construct($userId, $eventId, $status, $waitingList){

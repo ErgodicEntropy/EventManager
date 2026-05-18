@@ -1,5 +1,8 @@
 <?php
 
+require "./Registration.php"; 
+
+
 // Central entity representing an online or offline event, including title, schedule, capacity, and linked participants.
 class Event {
     public int $id;
@@ -43,7 +46,7 @@ class Event {
         $this->capacity = $capacity;
     }
 
-    public function checkInUser(User $user): void { //convert user from an attendee (registered) to present
+    public function checkInUser(User $user): void { //convert user from registered to present
         foreach ($this->registeredUsers as $registeredUser) {
             if ($registeredUser->id === $user->id) {
 
@@ -55,6 +58,8 @@ class Event {
                 }
 
                 $this->presentUsers[] = $user;
+                $registration = new Registration($user->id, $this->id); 
+                $registration->status = "confirmed"; 
                 return;
             }
         }
@@ -64,14 +69,15 @@ class Event {
         $total = 0;
 
         foreach ($this->tickets as $ticket) {
-            $total += $ticket->price;
+            if ($ticket->type == "paid"){
+                $total += $ticket->price;
+            }
         }
 
         return $total;
     }
 
     public function getAttendanceRate(): float {
-
         $registered = count($this->registeredUsers);
 
         if ($registered === 0) {
@@ -94,7 +100,7 @@ class Event {
         return $this->capacity - count($this->registeredUsers);
     }
 
-    public function registerUser(User $user): void {
+    public function registerUser(User $user, string $ticketType): void {
         if ($this->isFull()) {
             return;
         }
@@ -105,6 +111,10 @@ class Event {
             }
         }
 
+        $registration = new Registration($user->id, $this->id); 
+        $registration->status = "waiting list"; 
+        $registration->ticketType = $ticketType; //free, paid, VIP
+
         $this->registeredUsers[] = $user;
     }
 
@@ -113,6 +123,10 @@ class Event {
             $this->registeredUsers,
             fn($u) => $u->id !== $user->id
         );
+
+        $registration = new Registration($user->id, $this->id); 
+        $registration->status = "cancelled"; 
+
     }
 
     public function addTicket(Ticket $ticket): void {
