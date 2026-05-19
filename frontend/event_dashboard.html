@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace Performance Analytics</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 2rem; background: #f8fafc; color: #0f172a; }
+        .metrics-grid { display: flex; gap: 1rem; margin-bottom: 2rem; }
+        .card { background: #fff; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 8px; flex: 1; }
+        .value { font-size: 2rem; font-weight: bold; margin-top: 0.5rem; }
+        table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #e2e8f0; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f1f5f9; }
+        .loading { color: #64748b; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <h1>Event Performance Analytics</h1>
+
+    <!-- KPI Aggregated Metrics Hooks -->
+    <div class="metrics-grid">
+        <div class="card">
+            <div>Total Registrations</div>
+            <div id="meta-registrations" class="value">...</div>
+        </div>
+        <div class="card">
+            <div>Gross Revenue</div>
+            <div id="meta-revenue" class="value">...</div>
+        </div>
+        <div class="card">
+            <div>Global Attendance Rate</div>
+            <div id="meta-attendance" class="value">...</div>
+        </div>
+    </div>
+
+    <!-- Tabular Breakdown Hook -->
+    <h2>Detailed Event Breakdown</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Event Title</th>
+                <th>Category</th>
+                <th>Registrations</th>
+                <th>Gross Revenue</th>
+                <th>Attendance Rate</th>
+            </tr>
+        </thead>
+        <tbody id="events-table-body">
+            <tr>
+                <td colspan="5" class="loading">Loading metric streams...</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Component Logic Asset Link -->
+    <script src="analytics.js"></script>
+</body>
+</html>
