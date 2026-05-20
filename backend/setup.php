@@ -35,14 +35,24 @@ try {
 
     // 4. Create Table: USERS
     $conn->query("
-        CREATE TABLE users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(100) NOT NULL,
-            email VARCHAR(150) NOT NULL UNIQUE,
-            type ENUM('participant', 'organizer', 'admin') NOT NULL DEFAULT 'participant',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB
+        CREATE TABLE IF NOT EXISTS `users` (
+        `id` INT AUTO_INCREMENT PRIMARY KEY,
+        `first_name` VARCHAR(50) NOT NULL,
+        `last_name` VARCHAR(50) NOT NULL,
+        `username` VARCHAR(50) NOT NULL,
+        `email` VARCHAR(100) NOT NULL,
+        `password` VARCHAR(255) NOT NULL,
+        `role` ENUM('participant', 'organizer') NOT NULL DEFAULT 'participant',
+        `creation_date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        
+        -- Prevent multiple entries from consuming identical identity metrics
+        UNIQUE KEY `unique_username` (`username`),
+        UNIQUE KEY `unique_email` (`email`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    
     ");
+
+    
     echo "-> Table 'users' generated.\n";
 
     // 5. Create Table: VENUES (Normalized out from Event's protected array structure)

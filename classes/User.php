@@ -1,45 +1,73 @@
 <?php
 
 // Represents any platform user (attendee/participant, organizer, admin). Stores identity info, roles, and registered events.
-class User { 
-    public int $id;
-    public string $name;
-    protected string $email;
-    private string $password;
-    public string $role; // participant, organizer or admin
-    private DateTime $creationDate;
 
-    public function _construct(int $id, string $name, string $email, string $password, string $role){
-        $this->id = $id;
-        $this->name = $name;
-        $this->email = $email;
-        $this->password = $password;
-        $this->role = $role; 
-        $this->creationDate = date();  
+class User { 
+    // State management properties
+    public ?int $id = null; // Nullable until pulled from or saved to DB
+    public string $firstName;
+    public string $lastName;
+    public string $username;
+    public string $email;
+    private string $password;
+    public string $role; // participant, organizer, or admin
+    private ?string $creationDate = null;
+
+    // Database connection holder
+    private mysqli $db;
+
+    // The constructor now expects the database connection, matching: new User($conn)
+    public function __construct(mysqli $conn) {
+        $this->db = $conn;
     }
 
-    public function getId(): int { return $this->id; }
-    public function getName(): string { return $this->name; }
+    /**
+     * Executes an INSERT statement safely using prepared statements.
+     */
+    public function register(string $firstName, string $lastName, string $username, string $email, string $password, string $role): bool {
+        // 1. Secure the plain-text password variant using standard bcrypt hashing
+        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+        
+        // 2. Draft the safe SQL statement structure
+        $sql = "INSERT INTO users (first_name, last_name, username, email, password, role) 
+                VALUES (?, ?, ?, ?, ?, ?)";
+        
+        // 3. Prepare the statement to block SQL Injection payloads entirely
+        if ($stmt = $this->db->prepare($sql)) {
+            // Bind parameters ('ssssss' tells MySQL all six variables are strings)
+            $stmt->bind_param("ssssss", $firstName, $lastName, $username, $email, $hashedPassword, $role);
+            
+            // Execute the operation against the persistent storage layer
+            if ($stmt->execute()) {
+                // Populate this instance context properties on successful creation loop
+                $this->id = $stmt->insert_id;
+                $this->firstName = $firstName;
+                $this->lastName = $lastName;
+                $this->username = $username;
+                $this->email = $email;
+                $this->role = $role;
+                
+                $stmt->close();
+                return true;
+            }
+            $stmt->close();
+        }
+        return false;
+    }
+
+    // Accessor Methods (Getters)
+    public function getId(): ?int { return $this->id; }
+    public function getUsername(): string { return $this->username; }
     public function getEmail(): string { return $this->email; }
     public function getRole(): string { return $this->role; }
 
-    public function login(){
-
-    }
-
-    public function logout(){
-
-    }
-
-    public function modifyProfile(){
-
-    }
-
+    public function login() { /* Authentication module logic rules go here */ }
+    public function logout() { /* Session clearance handlers go here */ }
+    public function modifyProfile() { /* Target attribute update operations go here */ }
 }
 
-
 class Participant extends User {
-    public int $id;
+    public ?int $id;
     public Ticket $ticket; // 
     public string $firstName;
     public string $lastName;
