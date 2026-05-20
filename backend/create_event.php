@@ -25,8 +25,9 @@ $category    = trim($_POST['category'] ?? '');
 $capacity    = isset($_POST['capacity']) ? filter_var($_POST['capacity'], FILTER_VALIDATE_INT) : false;
 $startInput  = trim($_POST['startDate'] ?? '');
 $endInput    = trim($_POST['endDate'] ?? '');
+$venue    = trim($_POST['venue'] ?? '');
 
-if (empty($title) || empty($description) || empty($category) || !$capacity || empty($startInput) || empty($endInput)) {
+if (empty($title) || empty($description) || empty($category) || !$capacity || empty($startInput) || empty($endInput) || empty($venue)) {
     http_response_code(400);
     echo json_encode([
         "status" => "error",
@@ -48,7 +49,7 @@ try {
     $formattedEnd   = $endDate->format('Y-m-d H:i:s');
 
     // 4. MySQLi Prepared Statement
-    $query = "INSERT INTO events (title, description, category, start_date, end_date, capacity, organizer_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $query = "INSERT INTO events (title, description, category, start_date, end_date, capacity, organizer_id, venue) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($query);
     
     if (!$stmt) {

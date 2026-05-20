@@ -19,8 +19,7 @@ if ($user->register($firstName, $lastName, $username, $email, $password, $role))
     
     // 3. Handle your conditional routing loops cleanly based on the chosen role
     if ($role === "participant") {
-        // Point this directly to your new event overview list template
-        header("Location: ../frontend/events_list.html");
+        header("Location: ../frontend/participate.html");
         exit; // Always exit immediately after a header redirect!
     } elseif ($role === "organizer") {
         // Point this to your new central dashboard interface panel
@@ -29,7 +28,7 @@ if ($user->register($firstName, $lastName, $username, $email, $password, $role))
     }
     
     // Safety fallback routing if an unexpected role bypasses validation
-    header("Location: ../frontend/login.html");
+    header("Location: ../frontend/start.html");
     exit;
 
 } else {

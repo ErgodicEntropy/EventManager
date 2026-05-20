@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Participant Workspace - SaaS Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full text-slate-900 antialiased">
+
+  <div class="min-h-full py-10 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto space-y-8">
+    
+    <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 pb-6">
+      <div>
+        <div class="flex items-center space-x-2 text-xs font-mono text-indigo-600 uppercase tracking-wider mb-1">
+          <span>// Participant Session Layer Active</span>
+        </div>
+        <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">My Learning Hub</h1>
+        <p class="mt-1 text-sm text-slate-500">Manage your event reservations, track assigned tickets, and submit dynamic peer feedback values.</p>
+      </div>
+      <div class="flex items-center space-x-3">
+        <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-800 border border-slate-200">
+          Logged in as: <strong class="ml-1 text-slate-900" id="session-username">@loading...</strong>
+        </span>
+        <a href="../backend/logout.php" class="rounded-lg bg-white border border-slate-200 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm">
+          Sign Out
+        </a>
+      </div>
+    </header>
+
+    <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <div class="lg:col-span-2 space-y-8">
+        
+        <section class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
+              <span>🎟️</span> Registered Events Schedule (<code class="font-mono text-xs text-indigo-600">$registeredEvents</code>)
+            </h2>
+            <span class="text-xs text-slate-400 font-mono" id="registered-count">0 items active</span>
+          </div>
+
+          <div id="upcoming-events-list" class="space-y-4">
+            <div class="text-center py-8 bg-white border border-slate-200 rounded-xl text-xs text-slate-400 italic">
+              Loading active schema records from server pipeline...
+            </div>
+          </div>
+        </section>
+
+        <section class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
+              <span>🔖</span> Bookmarked Reading Lists (<code class="font-mono text-xs text-indigo-600">$favoriteEvents</code>)
+            </h2>
+            <button onclick="triggerBookmarkPrompt()" class="text-xs font-semibold text-indigo-600 hover:text-indigo-500 transition">
+              + Add Bookmark Instance
+            </button>
+          </div>
+
+          <div id="favorite-events-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="sm:col-span-2 text-center py-6 bg-white border border-slate-200 rounded-xl text-xs text-slate-400 italic">
+              Loading bookmarks...
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <div class="space-y-8">
+        
+        <section class="bg-gradient-to-br from-slate-900 to-indigo-950 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden border border-slate-800">
+          <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl"></div>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center rounded-md bg-indigo-500/20 px-2 py-0.5 text-[10px] font-medium text-indigo-300 ring-1 ring-inset ring-indigo-400/20 font-mono uppercase tracking-wider">
+                Active Ticket Object
+              </span>
+              <span class="text-[11px] font-mono text-slate-400">UUID Verified</span>
+            </div>
+            <div class="space-y-1">
+              <div class="text-[10px] uppercase font-mono text-indigo-300 tracking-wide font-bold">Assigned Seat / Access Pass</div>
+              <h3 class="text-lg font-bold tracking-tight text-white leading-tight" id="ticket-title">Loading Active System Pass...</h3>
+              <p class="text-xs text-slate-400 font-mono mt-1" id="ticket-meta">Tier: Processing...</p>
+            </div>
+            <div class="border-t border-slate-800 pt-4 flex items-center justify-between text-xs font-mono text-slate-400">
+              <div>Barcode Signature:</div>
+              <div class="text-white bg-slate-800/80 px-2 py-1 rounded tracking-widest font-bold" id="ticket-barcode">#PENDING</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+          <div class="space-y-1">
+            <h3 class="text-sm font-bold text-slate-900">Post-Event Evaluation Engine</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">Triggers your class methods <code class="bg-slate-100 text-rose-600 px-1 rounded font-mono">reviewEvent()</code> and <code class="bg-slate-100 text-rose-600 px-1 rounded font-mono">rateEvent()</code> synchronously.</p>
+          </div>
+
+          <form id="evaluation-form" class="space-y-4 pt-2">
+            <div>
+              <label for="event_id" class="block text-xs font-semibold text-slate-700 mb-1">Target Attended Event</label>
+              <select id="event_select" name="event_id" required
+                      class="block w-full rounded-lg border border-slate-300 px-3 py-2 bg-white text-slate-900 focus:border-indigo-500 focus:outline-none text-xs">
+                <option value="" disabled selected>Select an active instance</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Assign Numerical Score (1 - 5 Stars)</label>
+              <div class="grid grid-cols-5 gap-2">
+                <label class="border border-slate-200 rounded-lg p-2 text-center text-xs font-bold cursor-pointer hover:bg-slate-50 block">
+                  <input type="radio" name="rate" value="1" required class="sr-only peer">
+                  <span class="text-slate-700 peer-checked:text-indigo-600">1 ★</span>
+                </label>
+                <label class="border border-slate-200 rounded-lg p-2 text-center text-xs font-bold cursor-pointer hover:bg-slate-50 block">
+                  <input type="radio" name="rate" value="2" class="sr-only peer">
+                  <span class="text-slate-700 peer-checked:text-indigo-600">2 ★</span>
+                </label>
+                <label class="border border-slate-200 rounded-lg p-2 text-center text-xs font-bold cursor-pointer hover:bg-slate-50 block">
+                  <input type="radio" name="rate" value="3" class="sr-only peer">
+                  <span class="text-slate-700 peer-checked:text-indigo-600">3 ★</span>
+                </label>
+                <label class="border border-slate-200 rounded-lg p-2 text-center text-xs font-bold cursor-pointer hover:bg-slate-50 block">
+                  <input type="radio" name="rate" value="4" class="sr-only peer">
+                  <span class="text-slate-700 peer-checked:text-indigo-600">4 ★</span>
+                </label>
+                <label class="border border-slate-200 rounded-lg p-2 text-center text-xs font-bold cursor-pointer hover:bg-slate-50 block">
+                  <input type="radio" name="rate" value="5" class="sr-only peer">
+                  <span class="text-slate-700 peer-checked:text-indigo-600">5 ★</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label for="feedback" class="block text-xs font-semibold text-slate-700 mb-1">Qualitative Feedback Statement</label>
+              <textarea id="feedback" name="feedback" rows="3" required
+                        placeholder="Detail the performance parameters..."
+                        class="block w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none text-xs resize-none"></textarea>
+            </div>
+
+            <button type="submit"
+                    class="w-full inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-indigo-500 transition">
+              Dispatch Evaluation Payload
+            </button>
+          </form>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Initial setup sequence running concurrent endpoint checks
+        syncUserProfile();
+        syncDashboardComponents();
+        
+        // Intercept form dispatch to execute reviewEvent() & rateEvent() controller
+        document.getElementById("evaluation-form").addEventListener("submit", executeEvaluationRoute);
+    });
+
+    // Retrieves current username from session
+    async function syncUserProfile() {
+        try {
+            const res = await fetch("../backend/get_profile.php");
+            if (!res.ok) { window.location.href = "login.html"; return; }
+            const data = await res.json();
+            document.getElementById("session-username").textContent = `@${escapeHtml(data.username)}`;
+        } catch (err) {
+            console.error("Profile payload sync drop:", err);
+        }
+    }
+
+    // Pulls data generated by your getUpcomingEvents() class method
+    async function syncDashboardComponents() {
+        try {
+            const res = await fetch("../backend/get_upcoming_events.php");
+            if (!res.ok) throw new Error("Could not parse schedule data streams.");
+            const data = await res.json(); // Structure shape expected: { registered: [...], favorites: [...], ticket: {...} }
+
+            renderRegisteredEvents(data.registered || []);
+            renderFavoriteEvents(data.favorites || []);
+            populateDropdowns(data.registered || []);
+            updateTicketWidget(data.ticket || null);
+        } catch (err) {
+            console.error("Dashboard component syncing fault:", err);
+        }
+    }
+
+    // 1. Renders structural rows and hooks up your cancelEvent() operation
+    function renderRegisteredEvents(eventsArr) {
+        const container = document.getElementById("upcoming-events-list");
+        document.getElementById("registered-count").textContent = `${eventsArr.length} instances active`;
+
+        if (eventsArr.length === 0) {
+            container.innerHTML = `<div class="text-center py-8 bg-white border border-slate-200 rounded-xl text-xs text-slate-400 italic">No registered events found.</div>`;
+            return;
+        }
+
+        container.innerHTML = "";
+        eventsArr.forEach(event => {
+            const row = document.createElement("div");
+            row.className = "bg-white border border-slate-200 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition shadow-sm";
+            row.innerHTML = `
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <span class="inline-block bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[10px] font-mono uppercase tracking-wide font-bold">${escapeHtml(event.category)}</span>
+                        <span class="text-xs text-slate-400 font-mono">${escapeHtml(event.date)}</span>
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-900">${escapeHtml(event.title)}</h3>
+                </div>
+                <button type="button" onclick="executeCancelRoute(${event.id})"
+                        class="rounded-lg bg-rose-50 border border-rose-200 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-100/70 transition shrink-0">
+                    Cancel Registration
+                </button>
+            `;
+            container.appendChild(row);
+        });
+    }
+
+    // 2. Triggers the cancelEvent() routine inside your PHP class structure
+    async function executeCancelRoute(eventId) {
+        if (!confirm("Execute cancelEvent() call sequence on backend storage engines?")) return;
+
+        try {
+            const payload = new FormData();
+            payload.append("event_id", eventId);
+
+            const res = await fetch("../backend/cancel_registration.php", {
+                method: "POST",
+                body: payload
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                syncDashboardComponents(); // Reload views automatically
+            } else {
+                alert(`Execution error: ${result.message}`);
+            }
+        } catch (err) {
+            console.error("Network system loop error:", err);
+        }
+    }
+
+    // 3. Renders bookmarks saved via bookmarkEvent()
+    function renderFavoriteEvents(favoritesArr) {
+        const container = document.getElementById("favorite-events-grid");
+
+        if (favoritesArr.length === 0) {
+            container.innerHTML = `<div class="sm:col-span-2 text-center py-6 bg-white border border-slate-200 rounded-xl text-xs text-slate-400 italic">Your bookmarked records collection matrix is currently empty.</div>`;
+            return;
+        }
+
+        container.innerHTML = "";
+        favoritesArr.forEach(event => {
+            const gridCard = document.createElement("div");
+            gridCard.className = "bg-white border border-slate-200 rounded-xl p-4 flex justify-between items-center transition";
+            gridCard.innerHTML = `
+                <div class="space-y-0.5">
+                    <span class="text-[9px] font-mono uppercase tracking-widest text-slate-400 font-bold">${escapeHtml(event.category)}</span>
+                    <h4 class="text-xs font-bold text-slate-800 line-clamp-1">${escapeHtml(event.title)}</h4>
+                </div>
+                <span class="text-amber-400 text-sm select-none">★</span>
+            `;
+            container.appendChild(gridCard);
+        });
+    }
+
+    // 4. Triggers the bookmarkEvent() class method directly
+    async function triggerBookmarkPrompt() {
+        const targetId = prompt("Enter the Event ID integer reference to save to $favoriteEvents:");
+        if (!targetId) return;
+
+        try {
+            const payload = new FormData();
+            payload.append("event_id", targetId);
+
+            const res = await fetch("../backend/bookmark_event.php", {
+                method: "POST",
+                body: payload
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                syncDashboardComponents();
+            } else {
+                alert(result.message);
+            }
+        } catch (err) {
+            console.error("Bookmark operational route dropping:", err);
+        }
+    }
+
+    // 5. Connects your reviewEvent() and rateEvent() methods to the review form
+    async function executeEvaluationRoute(e) {
+        e.preventDefault();
+        const form = e.currentTarget;
+        const payload = new FormData(form);
+
+        try {
+            const res = await fetch("../backend/submit_evaluation.php", {
+                method: "POST",
+                body: payload
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                alert("Evaluation dispatched. Class methods executed successfully.");
+                form.reset();
+                syncDashboardComponents();
+            } else {
+                alert(`Failed compilation sequence: ${result.message}`);
+            }
+        } catch (err) {
+            console.error("Evaluation posting fault:", err);
+        }
+    }
+
+    // Utility Component: Syncs option elements dynamically matching active dependencies
+    function populateDropdowns(events) {
+        const select = document.getElementById("event_select");
+        select.innerHTML = '<option value="" disabled selected>Select an active instance</option>';
+        events.forEach(e => {
+            const opt = document.createElement("option");
+            opt.value = e.id;
+            opt.textContent = e.title;
+            select.appendChild(opt);
+        });
+    }
+
+    // Utility Component: Maps fields directly from your $ticket object
+    function updateTicketWidget(ticket) {
+        if (!ticket) {
+            document.getElementById("ticket-title").textContent = "No Assigned Entry Passes";
+            document.getElementById("ticket-meta").textContent = "Tier: Unallocated Null Registry";
+            document.getElementById("ticket-barcode").textContent = "#VOID-0";
+            return;
+        }
+        document.getElementById("ticket-title").textContent = ticket.eventTitle;
+        document.getElementById("ticket-meta").textContent = `Tier: ${ticket.tierName}`;
+        document.getElementById("ticket-barcode").textContent = `#${ticket.serialNumber}`;
+    }
+
+    // Anti-XSS String Sanitizer Block
+    function escapeHtml(str) {
+        if(!str) return '';
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+  </script>
+</body>
+</html>

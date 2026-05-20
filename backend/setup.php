@@ -55,17 +55,17 @@ try {
     
     echo "-> Table 'users' generated.\n";
 
-    // 5. Create Table: VENUES (Normalized out from Event's protected array structure)
-    $conn->query("
-        CREATE TABLE venues (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(100) NOT NULL,
-            address VARCHAR(255) NOT NULL,
-            capacity INT NOT NULL,
-            is_available TINYINT(1) NOT NULL DEFAULT 1
-        ) ENGINE=InnoDB
-    ");
-    echo "-> Table 'venues' generated.\n";
+    // // 5. Create Table: VENUES (Normalized out from Event's protected array structure)
+    // $conn->query("
+    //     CREATE TABLE venues (
+    //         id INT AUTO_INCREMENT PRIMARY KEY,
+    //         name VARCHAR(100) NOT NULL,
+    //         address VARCHAR(255) NOT NULL,
+    //         capacity INT NOT NULL,
+    //         is_available TINYINT(1) NOT NULL DEFAULT 1
+    //     ) ENGINE=InnoDB
+    // ");
+    // echo "-> Table 'venues' generated.\n";
 
     // 6. Create Table: EVENTS
     $conn->query("
@@ -78,7 +78,7 @@ try {
             end_date DATETIME NOT NULL,
             organizer_id INT NOT NULL,
             capacity INT NOT NULL,
-            venue_id INT NULL,
+            venue VARCHAR(150) NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (organizer_id) REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE,
             FOREIGN KEY (venue_id) REFERENCES venues(id) ON DELETE SET NULL ON UPDATE CASCADE

@@ -48,6 +48,17 @@ try {
             "status" => "success",
             "message" => "Login successful. Redirecting to your workspace..."
         ]);
+
+        // 3. Handle your conditional routing loops cleanly based on the chosen role
+        if ($user['role'] === "participant") {
+            header("Location: ../frontend/participate.html");
+            exit; // Always exit immediately after a header redirect!
+        } elseif ($user['role'] === "organizer") {
+            // Point this to your new central dashboard interface panel
+            header("Location: ../frontend/panel.html");
+            exit;
+        }
+
     } else {
         // Enforce generic response context for missing users vs wrong passwords to block email scouting
         http_response_code(401);
