@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Registration Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full text-slate-900 antialiased py-12">
+
+  <div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    
+    <nav class="flex items-center space-x-2 text-sm font-medium text-slate-500">
+      <a href="./participant_dashboard.html" class="hover:text-indigo-600 transition-colors">Workspace Hub</a>
+      <span class="text-slate-400">/</span>
+      <span class="text-slate-900 font-semibold">Seat Reservation Terminal</span>
+    </nav>
+
+    <main class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      
+      <div id="registration-header" class="p-6 sm:p-8 border-b border-slate-100 bg-slate-50/50 space-y-2">
+        <div class="h-4 w-24 bg-slate-200 rounded animate-pulse"></div>
+        <div class="h-8 w-3/4 bg-slate-200 rounded animate-pulse"></div>
+      </div>
+
+      <form id="registration-form" class="p-6 sm:p-8 space-y-6">
+        <input type="hidden" id="event-id-field" name="event_id" value="">
+
+        <div class="space-y-2">
+          <label for="ticket_tier" class="block text-xs font-bold font-mono text-slate-400 uppercase tracking-wider">// Select Admission Tier</label>
+          <select id="ticket_tier" name="tier_name" required
+                  class="block w-full rounded-xl border border-slate-300 px-4 py-3 bg-white text-slate-950 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none text-sm shadow-sm">
+            <option value="General Admission" selected>General Admission Pass</option>
+            <option value="VIP Access Tier">VIP Access Tier (+Bonus Materials)</option>
+            <option value="Student / Academic">Student / Academic Pass</option>
+          </select>
+        </div>
+
+        <div class="p-4 rounded-xl bg-indigo-50/50 border border-indigo-100 flex items-start gap-3">
+          <span class="text-base select-none mt-0.5">ℹ️</span>
+          <div class="text-xs text-slate-600 leading-relaxed">
+            <strong class="text-indigo-900">Allocation Terms:</strong> Submitting this registration locks 1 unit inside the global structural capacity pool. Your verified access barcode will generate instantly inside your workspace dashboard hub.
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-2 border-t border-slate-150">
+          <a href="./participant_dashboard.html" class="rounded-xl border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-sm">
+            Cancel Allocation
+          </a>
+          <button type="submit" id="submit-btn" disabled
+                  class="rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-indigo-500 transition disabled:opacity-50 disabled:cursor-not-allowed">
+            Confirm & Reserve Seat
+          </button>
+        </div>
+
+      </form>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const headerShell = document.getElementById("registration-header");
+        const formInputId = document.getElementById("event-id-field");
+        const submitBtn = document.getElementById("submit-btn");
+        const regForm = document.getElementById("registration-form");
+
+        // Parse query string variable constraints (?id=X)
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = urlParams.get('id');
+
+        // If user loaded page directly without an id parameters string
+        if (!eventId) {
+            headerShell.innerHTML = `
+                <div class="text-xs font-mono text-rose-600">// Context Routing Fault: Target identification profile missing. Please select an event from the explorer layout first.</div>`;
+            return;
+        }
+
+        // Drop verified reference ID string value directly into form field context
+        formInputId.value = eventId;
+
+        try {
+            // Asynchronously pull event metadata summary block profile metrics
+            const response = await fetch(`../backend/get_event.php?id=${eventId}`);
+            if (!response.ok) throw new Error("Fault mapped inside database context retrieval stream.");
+            const event = await response.json();
+
+            // Replace skeleton templates loader animation with actual contextual node fields
+            headerShell.innerHTML = `
+                <span class="inline-flex items-center rounded-md bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-700 ring-1 ring-inset ring-indigo-700/10 font-mono uppercase tracking-wide">${escapeHtml(event.category || 'General')}</span>
+                <h1 class="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">Register for: ${escapeHtml(event.title)}</h1>
+                <p class="text-xs text-slate-400 font-mono mt-0.5">Initializing entry process targeting record index ID #${event.id}</p>
+            `;
+            
+            // Enable interaction execution loops
+            submitBtn.removeAttribute("disabled");
+
+        } catch (err) {
+            headerShell.innerHTML = `
+                <div class="text-xs font-mono text-rose-600">// Target context profile mapping loop pipeline drops error: ${err.message}</div>`;
+        }
+
+        // Catch transmission submit payload
+        regForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            submitBtn.setAttribute("disabled", "true");
+            submitBtn.textContent = "Processing Registry Allocation...";
+
+            try {
+                const payload = new FormData(regForm);
+                const res = await fetch("../backend/register_event.php", {
+                    method: "POST",
+                    body: payload
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    alert("Seat reservation compiled! Secure barcode allocated to your active profile session.");
+                    window.location.href = "./participant_dashboard.html"; // Redirect smoothly back to home layout hub
+                } else {
+                    alert(`Registry Pipeline Interruption: ${result.message}`);
+                    submitBtn.removeAttribute("disabled");
+                    submitBtn.textContent = "Confirm & Reserve Seat";
+                }
+            } catch (networkErr) {
+                console.error("Transmission error payload matrix loop dropping:", networkErr);
+                submitBtn.removeAttribute("disabled");
+                submitBtn.textContent = "Confirm & Reserve Seat";
+            }
+        });
+    });
+
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  </script>
+</body>
+</html>

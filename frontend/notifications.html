@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Broadcast Alerts & System Feed</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full text-slate-900 antialiased py-12">
+
+  <div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    
+    <nav class="flex items-center space-x-2 text-sm font-medium text-slate-500">
+      <a href="./participant_dashboard.html" class="hover:text-indigo-600 transition-colors">Workspace Hub</a>
+      <span class="text-slate-400">/</span>
+      <span class="text-slate-900 font-semibold">Notification Center Feed</span>
+    </nav>
+
+    <main class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div>
+          <h2 class="text-base font-bold text-slate-900">System Broadcast Streams</h2>
+          <p class="text-xs text-slate-400">Real-time registration state change messages log matrix.</p>
+        </div>
+        <button id="clear-feed-btn" class="text-xs font-mono text-slate-400 hover:text-rose-600 border border-slate-200 bg-white rounded-lg px-2.5 py-1.5 transition">
+          Flush Stream
+        </button>
+      </div>
+
+      <div id="notifications-stream-box" class="divide-y divide-slate-100">
+        <div class="p-6 text-center text-xs text-slate-400 italic animate-pulse">
+          Synchronizing message arrays directly with server thread layers...
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const targetContainer = document.getElementById("notifications-stream-box");
+        
+        try {
+            const res = await fetch("../backend/get_notifications.php");
+            if (!res.ok) throw new Error("Fault registered processing backend message collection loops.");
+            const alerts = await res.json();
+
+            if (alerts.length === 0) {
+                targetContainer.innerHTML = `<div class="p-8 text-center text-xs text-slate-400 italic">No historical modifications or broadcast entities exist in profile domain.</div>`;
+                return;
+            }
+
+            targetContainer.innerHTML = "";
+            alerts.forEach(item => {
+                const messageBlock = document.createElement("div");
+                messageBlock.className = `p-5 flex gap-4 items-start transition hover:bg-slate-50/60 ${item.is_read ? 'opacity-70' : ''}`;
+                messageBlock.innerHTML = `
+                    <span class="text-base select-none mt-0.5">${item.alert_type === 'critical' ? '🚨' : '✉️'}</span>
+                    <div class="space-y-1 flex-1">
+                        <div class="flex items-center justify-between text-[11px] font-mono">
+                            <span class="text-indigo-600 font-bold uppercase tracking-wider">// ${escapeHtml(item.context_tag || 'Broadcast')}</span>
+                            <span class="text-slate-400">${escapeHtml(item.timestamp)}</span>
+                        </div>
+                        <p class="text-xs text-slate-700 font-sans leading-relaxed">${escapeHtml(item.message_content)}</p>
+                    </div>
+                `;
+                targetContainer.appendChild(messageBlock);
+            });
+
+        } catch(err) {
+            targetContainer.innerHTML = `<div class="p-6 text-xs font-mono text-rose-600">// Feed configuration fault error: ${err.message}</div>`;
+        }
+
+        document.getElementById("clear-feed-btn").addEventListener("click", async () => {
+            if(!confirm("Purge system message registry snapshots?")) return;
+            await fetch("../backend/clear_notifications.php", { method: "POST" });
+            location.reload();
+        });
+    });
+
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  </script>
+</body>
+</html>

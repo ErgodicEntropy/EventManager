@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Asset Search Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full text-slate-900 antialiased py-12">
+
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    
+    <nav class="flex items-center space-x-2 text-sm font-medium text-slate-500">
+      <a href="./participant_dashboard.html" class="hover:text-indigo-600 transition-colors">Workspace Hub</a>
+      <span class="text-slate-400">/</span>
+      <span class="text-slate-900 font-semibold">Registry Query Engine</span>
+    </nav>
+
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+      <div class="space-y-1">
+        <label for="search-input" class="block text-xs font-bold font-mono text-slate-400 uppercase tracking-wider">// Dynamic String Constraint Lookup</label>
+        <div class="relative rounded-xl shadow-sm mt-1">
+          <input type="text" id="search-input" placeholder="Type keywords, categories, or hosts..."
+                 class="block w-full rounded-xl border border-slate-300 pl-4 pr-12 py-3 bg-white text-slate-950 placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none text-sm shadow-sm">
+          <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-sm select-none">🔍</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="search-results-output" class="space-y-4">
+      <div class="text-center py-10 bg-white border border-slate-200 rounded-2xl text-xs text-slate-400 italic">
+        Awaiting input parameters...
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const inputField = document.getElementById("search-input");
+        const outputShell = document.getElementById("search-results-output");
+        let debounceTimer;
+
+        inputField.addEventListener("keyup", () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(async () => {
+                const queryStr = encodeURIComponent(inputField.value.trim());
+                if(queryStr.length < 2) {
+                    outputShell.innerHTML = `<div class="text-center py-10 bg-white border border-slate-200 rounded-2xl text-xs text-slate-400 italic">Enter at least 2 characters to trigger query loops.</div>`;
+                    return;
+                }
+
+                try {
+                    const res = await fetch(`../backend/search_handler.php?q=${queryStr}`);
+                    if (!res.ok) throw new Error("Search cluster dropped lookup fault logic.");
+                    const records = await res.json();
+
+                    if(records.length === 0) {
+                        outputShell.innerHTML = `<div class="text-center py-12 bg-white border border-slate-200 rounded-2xl text-xs text-slate-400 italic">Zero index matches verified for string constraint context.</div>`;
+                        return;
+                    }
+
+                    outputShell.innerHTML = "";
+                    records.forEach(item => {
+                        const row = document.createElement("div");
+                        row.className = "bg-white border border-slate-200 rounded-xl p-4 flex justify-between items-center transition shadow-sm hover:border-slate-300";
+                        row.innerHTML = `
+                            <div class="space-y-0.5">
+                                <span class="text-[9px] font-mono uppercase bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-bold tracking-wide">${escapeHtml(item.category)}</span>
+                                <h4 class="text-sm font-bold text-slate-900 mt-1">${escapeHtml(item.title)}</h4>
+                            </div>
+                            <a href="./register_to_event.html?id=${item.id}" class="text-xs font-bold text-indigo-600 hover:text-indigo-500 bg-indigo-50/50 hover:bg-indigo-50 px-3 py-2 rounded-lg transition">
+                                S'inscrire
+                            </a>
+                        `;
+                        outputShell.appendChild(row);
+                    });
+                } catch(err) {
+                    outputShell.innerHTML = `<div class="text-xs font-mono text-rose-600 bg-rose-50 border border-rose-200 rounded-xl p-4">// Pipeline interrupt query breakdown: ${err.message}</div>`;
+                }
+            }, 300); // 300ms Debounce Gate Allocation
+        });
+    });
+
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  </script>
+</body>
+</html>

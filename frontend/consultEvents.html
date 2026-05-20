@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Consulting Advisory Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full text-slate-900 antialiased py-12">
+
+  <div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    
+    <nav class="flex items-center space-x-2 text-sm font-medium text-slate-500">
+      <a href="./events_list.html" class="hover:text-indigo-600 transition-colors">Abstraction Stream</a>
+      <span class="text-slate-400">/</span>
+      <span class="text-slate-900 font-semibold">Consulting Allocation Seat</span>
+    </nav>
+
+    <main class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      
+      <div id="registration-header" class="p-6 sm:p-8 border-b border-slate-100 bg-slate-50/50 space-y-2">
+        <div class="h-4 w-24 bg-slate-200 rounded animate-pulse"></div>
+        <div class="h-8 w-3/4 bg-slate-200 rounded animate-pulse"></div>
+      </div>
+
+      <form id="registration-form" class="p-6 sm:p-8 space-y-6">
+        <input type="hidden" id="event-id-field" name="event_id" value="">
+
+        <div class="space-y-2">
+          <label for="ticket_tier" class="block text-xs font-bold font-mono text-slate-400 uppercase tracking-wider">// Strategic Engagement Tier</label>
+          <select id="ticket_tier" name="tier_name" required
+                  class="block w-full rounded-xl border border-slate-300 px-4 py-3 bg-white text-slate-950 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none text-sm shadow-sm">
+            <option value="Delegate Pass" selected>Standard Delegate Pass (General Sessions)</option>
+            <option value="Executive Advisory Circle">Executive Advisory Circle (1-on-1 Review Portfolio)</option>
+            <option value="Corporate Cohort Board">Corporate Cohort Board (Private Breakout Room Access)</option>
+          </select>
+        </div>
+
+        <div class="space-y-2">
+          <label for="consulting_focus" class="block text-xs font-bold font-mono text-slate-400 uppercase tracking-wider">// Primary Advisory Objective</label>
+          <select id="consulting_focus" name="consulting_focus" required
+                  class="block w-full rounded-xl border border-slate-300 px-4 py-3 bg-white text-slate-950 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none text-sm shadow-sm">
+            <option value="" disabled selected>Select your operational vertical...</option>
+            <option value="Operations & Process Optimization">Operations & Process Optimization</option>
+            <option value="Financial Growth & Valuation Scaling">Financial Growth & Valuation Scaling</option>
+            <option value="SaaS Architecture & System Infrastructure">SaaS Architecture & System Infrastructure</option>
+            <option value="Market Penetration & Go-To-Market Blueprint">Market Penetration & Go-To-Market Blueprint</option>
+          </select>
+        </div>
+
+        <div class="space-y-2">
+          <label for="blocker_statement" class="block text-xs font-bold font-mono text-slate-400 uppercase tracking-wider">// Immediate Bottlenecks & Context</label>
+          <textarea id="blocker_statement" name="blocker_statement" rows="3" required
+                    placeholder="Briefly detail your top 1-2 operational blockers for the consulting panel to pre-review..."
+                    class="block w-full rounded-xl border border-slate-300 px-4 py-3 text-sm text-slate-950 placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none resize-none shadow-sm"></textarea>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 flex items-start gap-3">
+          <input type="checkbox" id="nda_agreement" name="nda_agreement" value="1" required
+                 class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 mt-0.5 cursor-pointer">
+          <label for="nda_agreement" class="text-xs text-slate-600 leading-relaxed cursor-pointer select-none">
+            I confirm the operational blockers submitted are valid, and I authorize the advisory board panel to audit this profile snapshot under standard corporate confidentiality frameworks.
+          </label>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-2 border-t border-slate-150">
+          <a href="./events_list.html" class="rounded-xl border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-sm">
+            Abort Request
+          </a>
+          <button type="submit" id="submit-btn" disabled
+                  class="rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-indigo-500 transition disabled:opacity-50 disabled:cursor-not-allowed">
+            Book Consulting Slot
+          </button>
+        </div>
+
+      </form>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const headerShell = document.getElementById("registration-header");
+        const formInputId = document.getElementById("event-id-field");
+        const submitBtn = document.getElementById("submit-btn");
+        const regForm = document.getElementById("registration-form");
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = urlParams.get('id');
+
+        if (!eventId) {
+            headerShell.innerHTML = `
+                <div class="text-xs font-mono text-rose-600">// Context Routing Fault: Target identification profile missing.</div>`;
+            return;
+        }
+
+        formInputId.value = eventId;
+
+        try {
+            const response = await fetch(`../backend/get_event.php?id=${eventId}`);
+            if (!response.ok) throw new Error("Fault mapped inside database context retrieval stream.");
+            const event = await response.json();
+
+            headerShell.innerHTML = `
+                <span class="inline-flex items-center rounded-md bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-700 ring-1 ring-inset ring-indigo-700/10 font-mono uppercase tracking-wide">${escapeHtml(event.category || 'Strategic Audit')}</span>
+                <h1 class="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">Secure Strategic Advisory Session</h1>
+                <p class="text-xs text-slate-500 font-sans mt-1">Booking allocation slot for: <strong class="text-slate-800 font-semibold">${escapeHtml(event.title)}</strong></p>
+            `;
+            
+            submitBtn.removeAttribute("disabled");
+
+        } catch (err) {
+            headerShell.innerHTML = `
+                <div class="text-xs font-mono text-rose-600">// Target context profile mapping loop pipeline drops error: ${err.message}</div>`;
+        }
+
+        regForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            submitBtn.setAttribute("disabled", "true");
+            submitBtn.textContent = "Reserving Advisory Allocation...";
+
+            try {
+                const payload = new FormData(regForm);
+                const res = await fetch("../backend/register_consulting_event.php", {
+                    method: "POST",
+                    body: payload
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    alert("Advisory token successfully reserved. Executive briefcase data structured.");
+                    window.location.href = "./participant_dashboard.html";
+                } else {
+                    alert(`Registry Pipeline Interruption: ${result.message}`);
+                    submitBtn.removeAttribute("disabled");
+                    submitBtn.textContent = "Book Consulting Slot";
+                }
+            } catch (networkErr) {
+                console.error("Transmission error payload matrix loop dropping:", networkErr);
+                submitBtn.removeAttribute("disabled");
+                submitBtn.textContent = "Book Consulting Slot";
+            }
+        });
+    });
+
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  </script>
+</body>
+</html>
