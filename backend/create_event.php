@@ -7,16 +7,16 @@ header('Content-Type: application/json; charset=utf-8');
 session_start();
 
 // 1. Authorization Guard
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    echo json_encode([
-        "status" => "error",
-        "message" => "Unauthorized access. Please log in."
-    ]);
-    exit;
-}
+// if (!isset($_SESSION['user_id'])) {
+//     http_response_code(401);
+//     echo json_encode([
+//         "status" => "error",
+//         "message" => "Unauthorized access. Please log in."
+//     ]);
+//     exit;
+// }
 
-$organizerId = (int)$_SESSION['user_id'];
+// $organizerId = (int)$_SESSION['user_id'];
 
 // 2. Strict Input Collection & Validation
 $title       = trim($_POST['title'] ?? '');

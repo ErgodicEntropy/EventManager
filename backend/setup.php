@@ -11,7 +11,7 @@ try {
     $conn = new mysqli(DB_HOST, DB_USER, DB_PASS);
     $conn->set_charset("utf8mb4");
 
-    if ($conn->connect_error()){
+    if ($conn->connect_error){
         die("connection failed!" . $conn->connection_error);
     }
     else {
@@ -22,7 +22,7 @@ try {
     $dbName = "`" . str_replace("`", "``", DB_NAME) . "`";
     $conn->query("CREATE DATABASE IF NOT EXISTS $dbName CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
     
-    if ($conn->error()){
+    if ($conn->error){
         die("database creation failed!" . $conn->error);
         }
         else {
