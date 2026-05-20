@@ -1,72 +1,88 @@
 <?php
-declare(strict_types=1);
+// backend/get_event.php
+
+session_start();
+header('Content-Type: application/json');
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+
+// Auth Guard Check
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['organizer', 'admin'])) {
+    http_response_code(401);
+    echo json_encode(['status' => 'error', 'message' => 'Unauthorized access container.']);
+    exit;
+}
 
 require_once 'db.php';
-header('Content-Type: application/json; charset=utf-8');
 
-// 1. Input Collection & Validation
-$eventId = isset($_GET['id']) ? filter_var($_GET['id'], FILTER_VALIDATE_INT) : false;
-
+// Validate requested integer parameter
+$eventId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$eventId) {
     http_response_code(400);
-    echo json_encode([
-        "status" => "error",
-        "message" => "Invalid or missing parameters: Event ID must be an integer."
-    ]);
+    echo json_encode(['status' => 'error', 'message' => 'Missing dynamic target sequence integer parameter.']);
     exit;
 }
 
 try {
-    // 2. Prepare Structured Query matching the core Event class schema
-    $query = "SELECT 
-                e.id, 
-                e.title, 
-                e.description, 
-                e.category, 
-                e.start_date AS startDate, 
-                e.end_date AS endDate, 
-                e.capacity,
-                u.name AS organizer
-              FROM events e
-              LEFT JOIN users u ON e.organizer_id = u.id
-              WHERE e.id = ?";
+    // Compile precise primary target record match
+    $query = "SELECT e.*, u.username AS organizer_name, u.email AS organizer_email 
+              FROM events e 
+              LEFT JOIN users u ON e.organizer_id = u.id 
+              WHERE e.id = ? LIMIT 1";
               
-    $stmt = $conn->prepare($query);
-    
-    if (!$stmt) {
-        throw new Exception("Statement preparation failed.");
+    if ($stmt = $conn->prepare($query)) {
+        $stmt->bind_param("i", $eventId);
+        $stmt->execute();
+        $event = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
     }
 
-    $stmt->bind_param("i", $eventId);
-    $stmt->execute();
-    
-    // Get results directly into associative array style with get_result()
-    $result = $stmt->get_result();
-    $eventData = $result->fetch_assoc();
-
-    // 3. Verify Record Existence Guard
-    if (!$eventData) {
+    if (!$event) {
         http_response_code(404);
-        echo json_encode([
-            "status" => "error",
-            "message" => "The requested event could not be found in this workspace."
-        ]);
-        $stmt->close();
+        echo json_encode(['status' => 'error', 'message' => 'Event index criteria matched no records.']);
         exit;
     }
 
-    // 4. Return Normalized Data Payload
-    http_response_code(200);
-    echo json_encode($eventData);
+    // Secondary Processing metrics allocations
+    $regCount = 0;
+    $regQ = "SELECT COUNT(*) as total FROM registrations WHERE event_id = ?";
+    if ($s = $conn->prepare($regQ)) { $s->bind_param("i", $eventId); $s->execute(); $regCount = intval($s->get_result()->fetch_assoc()['total'] ?? 0); $s->close(); }
 
-    $stmt->close();
+    $presentCount = 0;
+    $attQ = "SELECT COUNT(*) as total FROM registrations WHERE event_id = ? AND attended = 1";
+    if ($s = $conn->prepare($attQ)) { $s->bind_param("i", $eventId); $s->execute(); $presentCount = intval($s->get_result()->fetch_assoc()['total'] ?? 0); $s->close(); }
+
+    $rates = [];
+    $rateQ = "SELECT rating_score FROM feedback WHERE event_id = ? AND rating_score IS NOT NULL";
+    if ($s = $conn->prepare($rateQ)) { $s->bind_param("i", $eventId); $s->execute(); $res = $s->get_result(); while($r = $res->fetch_assoc()){ $rates[] = intval($r['rating_score']); } $s->close(); }
+
+    $reviews = [];
+    $revQ = "SELECT comments FROM feedback WHERE event_id = ? AND comments IS NOT NULL AND comments != ''";
+    if ($s = $conn->prepare($revQ)) { $s->bind_param("i", $eventId); $s->execute(); $res = $s->get_result(); while($r = $res->fetch_assoc()){ $reviews[] = $r['comments']; } $s->close(); }
+
+    // Map structural data matching frontend schemas
+    echo json_encode([
+        'id'                   => intval($event['id']),
+        'title'                => $event['title'],
+        'description'          => $event['description'],
+        'category'             => $event['category'] ?? 'Tech Development',
+        'capacity'             => intval($event['capacity']),
+        'startDate'            => $event['start_date'],
+        'endDate'              => $event['end_date'],
+        'registeredUsersCount' => $regCount,
+        'presentUsersCount'    => $presentCount,
+        'rates'                => $rates,
+        'reviews'              => $reviews,
+        'organizer' => [
+            'name'  => $event['organizer_name'] ?? 'Core System Team',
+            'email' => $event['organizer_email'] ?? 'admin@system.local'
+        ],
+        'venue' => [
+            'name'    => $event['venue'] ?? 'Virtual Space Terminal',
+            'address' => $event['venue_address'] ?? 'Cloud Instance Domain'
+        ]
+    ]);
 
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode([
-        "status" => "error",
-        "message" => "Internal workspace data transmission failure."
-    ]);
+    echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
 }
-
-?>

@@ -55,7 +55,6 @@
             targetContainer.innerHTML = "";
 
             events.forEach(event => {
-                // Safely processing structural arrays from your backend domain properties
                 const registeredCount = Array.isArray(event.registeredUsers) ? event.registeredUsers.length : (parseInt(event.registeredUsersCount) || 0);
                 const presentCount = Array.isArray(event.presentUsers) ? event.presentUsers.length : (parseInt(event.presentUsersCount) || 0);
                 const totalCapacity = parseInt(event.capacity) || 1;
@@ -63,11 +62,8 @@
                 const occupancyPercent = Math.min(100, Math.round((registeredCount / totalCapacity) * 100));
                 const attendancePercent = registeredCount > 0 ? Math.min(100, Math.round((presentCount / registeredCount) * 100)) : 0;
 
-                // Process $rates array to find mean
                 const ratesArr = event.rates || [];
                 const averageRating = ratesArr.length > 0 ? (ratesArr.reduce((a, b) => a + b, 0) / ratesArr.length).toFixed(1) : "N/A";
-
-                // Map the protected venue associative array
                 const venueObj = event.venue || { name: "Virtual Space", address: "Online Room Link", capacity: totalCapacity, isAvailable: true };
 
                 const card = document.createElement("article");
@@ -89,9 +85,17 @@
                             </div>
                         </div>
 
-                        <div class="space-y-2">
-                            <h2 class="text-2xl font-bold text-slate-900 tracking-tight">${escapeHtml(event.title)}</h2>
-                            <p class="text-sm text-slate-600 leading-relaxed max-w-3xl">${escapeHtml(event.description || 'No descriptive summary defined.')}</p>
+                        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                            <div class="space-y-2 flex-1">
+                                <h2 class="text-2xl font-bold text-slate-900 tracking-tight">${escapeHtml(event.title)}</h2>
+                                <p class="text-sm text-slate-600 leading-relaxed max-w-3xl">${escapeHtml(event.description || 'No descriptive summary defined.')}</p>
+                            </div>
+                            <div class="shrink-0 pt-1">
+                                <a href="./event_details.html?id=${event.id}" class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-slate-800 transition tracking-wide group/btn">
+                                  <span>View Full Profile</span>
+                                  <span class="ml-1.5 transform group-hover/btn:translate-x-0.5 transition-transform">➔</span>
+                                </a>
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-slate-50 border border-slate-200/60 p-5 rounded-xl text-xs">
@@ -138,20 +142,6 @@
                                         ${presentCount} checked in from ${registeredCount} reservations
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="space-y-2.5">
-                            <h4 class="text-xs font-bold uppercase font-mono tracking-wider text-slate-400">// Evaluation Feed Strings ($reviews)</h4>
-                            <div class="space-y-1.5 max-h-32 overflow-y-auto pr-2">
-                                ${event.reviews && event.reviews.length > 0 ? 
-                                    event.reviews.map(rev => `
-                                        <div class="p-2.5 bg-slate-50 border border-slate-100 rounded-lg text-xs text-slate-600 font-sans italic">
-                                            "${escapeHtml(rev)}"
-                                        </div>
-                                    `).join('') 
-                                    : `<div class="text-xs font-mono text-slate-400 italic">No historical evaluations logging items present in the cluster.</div>`
-                                }
                             </div>
                         </div>
 
