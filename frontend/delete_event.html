@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Event</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full text-slate-900 antialiased">
+
+  <div class="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    
+    <div class="sm:mx-auto sm:w-full sm:max-w-xl px-4 sm:px-0">
+      <nav class="flex items-center space-x-2 text-sm font-medium text-slate-500 mb-2">
+        <a href="#" class="hover:text-indigo-600 transition">Events</a>
+        <span class="text-slate-400">/</span>
+        <span class="text-slate-900">Delete configuration</span>
+      </nav>
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Remove Event Registry</h1>
+      <p class="mt-1 text-sm text-slate-500">Review the target structural instance carefully before executing the removal script loop.</p>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-xl px-4 sm:px-0">
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        
+        <div class="bg-rose-50 border-b border-rose-100 px-6 py-4 flex items-center space-x-3">
+          <span class="text-rose-600 text-xl">⚠️</span>
+          <h2 class="text-sm font-bold text-rose-800 tracking-wide uppercase">Critical Destructive Action Guard</h2>
+        </div>
+
+        <div class="p-6 sm:p-8 space-y-6">
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+            <span class="inline-flex items-center rounded-md bg-slate-200/60 px-2 py-1 text-xs font-medium text-slate-700 font-mono uppercase">ID: 101</span>
+            <h3 class="text-lg font-bold text-slate-900">Tech Global Summit 2026</h3>
+            <p class="text-xs text-slate-500 leading-relaxed line-clamp-2">This ecosystem module aggregates internal capacity indices dynamically across our target systems for global scale deployment operations tracking logs.</p>
+          </div>
+
+          <div class="text-sm text-slate-600 leading-relaxed">
+            Are you sure you want to trigger <code class="bg-slate-100 px-1.5 py-0.5 rounded font-mono text-xs text-rose-600 font-semibold">deleteEvent()</code>? This operation permanently updates collection parameters by stripping all assigned tickets, user registration elements, and feedback records from our live storage engine.
+          </div>
+
+          <div class="border-t border-slate-100 pt-2"></div>
+
+          <form action="../backend/delete_event.php" method="POST" class="flex items-center justify-end space-x-3">
+            
+            <input type="hidden" name="event_id" value="101">
+            
+            <a href="./index.html" 
+               class="rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition border border-slate-200 text-center">
+              Retain Event
+            </a>
+            <button type="submit" 
+                    class="rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-rose-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600 transition text-center">
+              Confirm Permanent Deletion
+            </button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

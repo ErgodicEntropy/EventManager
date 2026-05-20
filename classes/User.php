@@ -18,6 +18,11 @@ class User {
         $this->creationDate = date();  
     }
 
+    public function getId(): int { return $this->id; }
+    public function getName(): string { return $this->name; }
+    public function getEmail(): string { return $this->email; }
+    public function getRole(): string { return $this->role; }
+
     public function login(){
 
     }
@@ -30,9 +35,6 @@ class User {
 
     }
 
-    public function getRole(){
-        return $this->role; 
-    }
 }
 
 

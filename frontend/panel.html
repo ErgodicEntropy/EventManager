@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Control Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full text-slate-900 antialiased">
+
+  <div class="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    
+    <div class="sm:mx-auto sm:w-full sm:max-w-2xl px-4 sm:px-0">
+      <div class="flex items-center space-x-2.5 mb-2">
+        <div class="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-white text-sm shadow-sm shadow-indigo-600/20">E</div>
+        <nav class="flex items-center space-x-2 text-sm font-medium text-slate-500">
+          <span class="text-slate-900 font-semibold">Organizer Console</span>
+          <span class="text-slate-400">/</span>
+          <span class="text-slate-400">Management Dashboard</span>
+        </nav>
+      </div>
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Event Registry Operations</h1>
+      <p class="mt-1 text-sm text-slate-500">Select an execution route below to modify, provision, or purge instances from the system backend.</p>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-2xl px-4 sm:px-0">
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden divide-y divide-slate-100">
+        
+        <div class="p-6 hover:bg-slate-50/50 transition flex items-center justify-between group">
+          <div class="space-y-1 pr-4">
+            <div class="flex items-center space-x-2">
+              <span class="text-indigo-600 text-lg">➕</span>
+              <h2 class="text-sm font-bold text-slate-900 tracking-tight">Create New Event Instance</h2>
+            </div>
+            <p class="text-xs text-slate-500 leading-relaxed">Allocate venue capacity models, establish timeline properties, and publish a clean layout entry block.</p>
+          </div>
+          <a href="./create_event.html" 
+             class="shrink-0 rounded-lg bg-indigo-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-indigo-500 transition tracking-wide">
+            Launch Wizard
+          </a>
+        </div>
+
+        <div class="p-6 hover:bg-slate-50/50 transition flex items-center justify-between group">
+          <div class="space-y-1 pr-4">
+            <div class="flex items-center space-x-2">
+              <span class="text-amber-500 text-lg">📝</span>
+              <h2 class="text-sm font-bold text-slate-900 tracking-tight">Modify Active Event Attributes</h2>
+            </div>
+            <p class="text-xs text-slate-500 leading-relaxed">Update description matrices, shift timeline scheduling records, or extend structural ticket parameters.</p>
+          </div>
+          <a href="./modify_event.html" 
+             class="shrink-0 rounded-lg bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 border border-slate-200 hover:bg-slate-50 transition tracking-wide shadow-sm">
+            Edit Details
+          </a>
+        </div>
+
+        <div class="p-6 hover:bg-slate-50/50 transition flex items-center justify-between group">
+          <div class="space-y-1 pr-4">
+            <div class="flex items-center space-x-2">
+              <span class="text-rose-600 text-lg">❌</span>
+              <h2 class="text-sm font-bold text-slate-900 tracking-tight">Remove / Delete Event Registry</h2>
+            </div>
+            <p class="text-xs text-slate-500 leading-relaxed">Trigger standard destructive system routines to completely remove historical registries from storage engines.</p>
+          </div>
+          <a href="./delete_event.html" 
+             class="shrink-0 rounded-lg bg-rose-50 border border-rose-200 px-4 py-2.5 text-xs font-semibold text-rose-600 hover:bg-rose-100/70 transition tracking-wide shadow-sm">
+            Purge Registry
+          </a>
+        </div>
+
+        <div class="p-6 hover:bg-slate-50/50 transition flex items-center justify-between group">
+          <div class="space-y-1 pr-4">
+            <div class="flex items-center space-x-2">
+              <span class="text-emerald-500 text-lg">📋</span>
+              <h2 class="text-sm font-bold text-slate-900 tracking-tight">Show / Get Events Registry</h2>
+            </div>
+            <p class="text-xs text-slate-500 leading-relaxed">Fetch, analyze, and map complex event fields, tracking metrics like user arrays, review arrays, and nested venue states.</p>
+          </div>
+          <a href="./events_list.html" 
+             class="shrink-0 rounded-lg bg-emerald-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-emerald-500 transition tracking-wide">
+            Get Events
+          </a>
+        </div>
+
+      </div>
+
+      <div class="mt-4 flex items-center justify-between text-[11px] font-mono text-slate-400 px-2">
+        <span>Active User Context: Organizer ID #1</span>
+        <span class="text-slate-300">System Core v2.4.0</span>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
