@@ -11,14 +11,25 @@ try {
     $conn = new mysqli(DB_HOST, DB_USER, DB_PASS);
     $conn->set_charset("utf8mb4");
 
-    echo "Connection to server established successfully.\n";
+    if ($conn->connect_error()){
+        die("connection failed!" . $conn->connection_error);
+    }
+    else {
+        echo "Connection to server established successfully.\n";        
+    }
 
     // 2. Initialize Clean Workspace Schema Environment
     $dbName = "`" . str_replace("`", "``", DB_NAME) . "`";
     $conn->query("CREATE DATABASE IF NOT EXISTS $dbName CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-    $conn->select_db(DB_NAME);
     
-    echo "Database schema verification complete: " . DB_NAME . "\n";
+    if ($conn->error()){
+        die("database creation failed!" . $conn->error);
+        }
+        else {
+        echo "Database schema verification complete: " . DB_NAME . "\n";
+    }
+    $conn->select_db(DB_NAME);
+
 
     // 3. Drop existing system tables in reverse order of dependencies
     echo "Cleaning up existing data structures...\n";
@@ -55,17 +66,17 @@ try {
     
     echo "-> Table 'users' generated.\n";
 
-    // // 5. Create Table: VENUES (Normalized out from Event's protected array structure)
-    // $conn->query("
-    //     CREATE TABLE venues (
-    //         id INT AUTO_INCREMENT PRIMARY KEY,
-    //         name VARCHAR(100) NOT NULL,
-    //         address VARCHAR(255) NOT NULL,
-    //         capacity INT NOT NULL,
-    //         is_available TINYINT(1) NOT NULL DEFAULT 1
-    //     ) ENGINE=InnoDB
-    // ");
-    // echo "-> Table 'venues' generated.\n";
+    // 5. Create Table: VENUES (Normalized out from Event's protected array structure)
+    $conn->query("
+        CREATE TABLE venues (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(100) NOT NULL,
+            address VARCHAR(255) NOT NULL,
+            capacity INT NOT NULL,
+            is_available TINYINT(1) NOT NULL DEFAULT 1
+        ) ENGINE=InnoDB
+    ");
+    echo "-> Table 'venues' generated.\n";
 
     // 6. Create Table: EVENTS
     $conn->query("
@@ -78,9 +89,10 @@ try {
             end_date DATETIME NOT NULL,
             organizer_id INT NOT NULL,
             capacity INT NOT NULL,
-            venue VARCHAR(150) NOT NULL,
+            venue_id INT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (organizer_id) REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+            FOREIGN KEY (venue_id) REFERENCES venues(id) ON DELETE RESTRICT ON UPDATE CASCADE, 
         ) ENGINE=InnoDB
     ");
     echo "-> Table 'events' generated.\n";

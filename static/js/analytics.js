@@ -10,7 +10,7 @@ async function initAnalyticsDashboard() {
 
     try {
         // Fetch raw event payload array straight from backend MySQLi feed
-        const response = await fetch("api/get_events.php");
+        const response = await fetch("../backend/get_events.php");
         
         if (!response.ok) {
             throw new Error(`HTTP transaction failure: Status ${response.status}`);

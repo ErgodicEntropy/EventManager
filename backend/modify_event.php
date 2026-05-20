@@ -31,7 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Clean text strings against raw injection formatting strings
     $title = isset($_POST['title']) ? trim($_POST['title']) : '';
     $description = isset($_POST['description']) ? trim($_POST['description']) : '';
-    $venue = isset($_POST['venue']) ? trim($_POST['venue']) : '';
+    $venue_name    = trim($_POST['venue_name'] ?? ""); 
+    $venue_address = trim($_POST['venue_address'] ?? "");
+    $venue_capacity = isset($_POST['venue_capacity']) ? filter_var($_POST['venue_capacity'], FILTER_VALIDATE_INT): false;
     $category = isset($_POST['category']) ? trim($_POST['category']) : '';
     
     // Date/Time Strings
@@ -39,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $endDate = isset($_POST['endDate']) ? $_POST['endDate'] : '';
 
     // Validate absolute requirement fields
-    if (!$eventId || !$title || !$venue || !$capacity || !$startDate || !$endDate) {
+    if (!$eventId || !$title || !$venue || !$capacity || !$startDate || !$endDate || $venue_name || $venue_address || $venue_capacity) {
         http_response_code(400);
         echo json_encode([
             'status' => 'error',
@@ -65,7 +67,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             UPDATE events 
             SET title = ?, 
                 description = ?, 
-                venue = ?, 
                 category = ?, 
                 capacity = ?, 
                 start_date = ?, 
@@ -73,13 +74,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             WHERE id = ? AND organizer_id = ?
         ";
 
+        $venue_id;
+        
+        $preparedStatement = $conn->prepare("SELECT venue_id FROM events where id=$eventId"); 
+        $preparedStatement->execute();
+        $result = $preparedStatement->get_result(); 
+        if ($result->num_rows > 0){
+            $venue_id = $result;
+        } else{
+            $venue_id = NULL;
+        }
+        
+        
+        $conn->query("
+            UPDATE venues 
+            SET name = $venue_name, address = $venue_address, capacity = $venue_capacity
+            WHERE id = $venue_id 
+        ");
+
         if ($stmt = $conn->prepare($updateQuery)) {
             // Bind input values cleanly: s = string, i = integer
             $stmt->bind_param(
-                "ssssissii", 
+                "sssissii", 
                 $title, 
                 $description, 
-                $venue, 
                 $category, 
                 $capacity, 
                 $startDate, 
