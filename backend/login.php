@@ -58,7 +58,8 @@ try {
     }
 
     $stmt->close();
-
+    header("Location: ../frontend/home.html"); 
+    exit;
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode([
