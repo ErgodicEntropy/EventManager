@@ -1,27 +1,53 @@
 <?php
 
 // Represents any platform user (attendee/participant, organizer, admin). Stores identity info, roles, and registered events.
-
-class User {
+class User { 
     public int $id;
     public string $name;
-    public string $type; // participant, organizer or admin (role)
-    public Ticket $ticket; // 
-    public string $email;
-    public array $registeredEvents = [];
-    public array $favoriteEvents = []; 
+    protected string $email;
+    private string $password;
+    public string $role; // participant, organizer or admin
+    private DateTime $creationDate;
 
-    public function __construct(int $id, string $name, string $email, bool $isOrganizer = false, string $type) {
+    public function _construct(int $id, string $name, string $email, string $password, string $role){
         $this->id = $id;
         $this->name = $name;
         $this->email = $email;
-        $this->type = $type; 
+        $this->password = $password;
+        $this->role = $role; 
+        $this->creationDate = date();  
     }
+
+    public function login(){
+
+    }
+
+    public function logout(){
+
+    }
+
+    public function modifyProfile(){
+
+    }
+
+    public function getRole(){
+        return $this->role; 
+    }
+}
+
+
+class Participant extends User {
+    public int $id;
+    public Ticket $ticket; // 
+    public string $firstName;
+    public string $lastName;
+    public array $registeredEvents = [];
+    public array $favoriteEvents = []; 
 
     public function registerForEvent(Event $event): void {
         if (!in_array($event, $this->registeredEvents, true)) {
             $this->registeredEvents[] = $event;
-            $event->registerUser($this);
+            $event->registerParticipant($this);
         }
     }
 
@@ -42,7 +68,7 @@ class User {
         return $this->registeredEvents;
     }
 
-    public function reviewEvent(Event $event, string $feedback): void{ // User feedback after attending an event (rating + comment).
+    public function reviewEvent(Event $event, string $feedback): void{ // Participant feedback after attending an event (rating + comment).
         $event->addReview($feedback);
     }
 
@@ -51,12 +77,12 @@ class User {
         $event->addRate($rate); 
     }
 
-    public function bookmarkEvent(Event $event): void { // Allows users to save or bookmark liked or favorite events.
+    public function bookmarkEvent(Event $event): void { // Allows Participants to save or bookmark liked or favorite events.
         $this->favoriteEvents[] = $event;
     }
 
     public function _destruct(){
-        echo "User destroyed!";
+        echo "Participant destroyed!";
         return; 
     }
 

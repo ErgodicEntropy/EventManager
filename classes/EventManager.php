@@ -2,12 +2,16 @@
 
 // Handles business logic such as creating events, registering users, searching events, doing analytics on event performance, and enforcing rules.
 
-class EventManager {
+class EventManager { //replaces Organizer class
     private array $events = [];
     private array $users = [];
 
     public function createEvent(Event $event): void {
         $this->events[] = $event;
+    }
+
+    public function modifyEvent(Event $event, string $description): void { //description as an example
+        $event->description = $description; 
     }
 
     public function deleteEvent(int $eventId): void {

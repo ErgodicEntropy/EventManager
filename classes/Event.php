@@ -2,7 +2,6 @@
 
 require "./Registration.php"; 
 
-
 // Central entity representing an online or offline event, including title, schedule, capacity, and linked participants.
 class Event {
     public int $id;
@@ -46,7 +45,7 @@ class Event {
         $this->capacity = $capacity;
     }
 
-    public function checkInUser(User $user): void { //convert user from registered to present
+    public function checkInUser(Participant $user): void { //convert user from registered to present
         foreach ($this->registeredUsers as $registeredUser) {
             if ($registeredUser->id === $user->id) {
 
@@ -100,7 +99,7 @@ class Event {
         return $this->capacity - count($this->registeredUsers);
     }
 
-    public function registerUser(User $user, string $ticketType): void {
+    public function registerUser(Participant $user, string $ticketType): void {
         if ($this->isFull()) {
             return;
         }
@@ -118,7 +117,7 @@ class Event {
         $this->registeredUsers[] = $user;
     }
 
-    public function cancelRegistration(User $user): void {
+    public function cancelRegistration(Participant $user): void {
         $this->registeredUsers = array_filter(
             $this->registeredUsers,
             fn($u) => $u->id !== $user->id
