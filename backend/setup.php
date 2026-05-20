@@ -81,7 +81,6 @@ try {
             venue VARCHAR(150) NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (organizer_id) REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-            FOREIGN KEY (venue_id) REFERENCES venues(id) ON DELETE SET NULL ON UPDATE CASCADE
         ) ENGINE=InnoDB
     ");
     echo "-> Table 'events' generated.\n";
