@@ -17,7 +17,7 @@
       </div>
       <div class="flex items-center space-x-3 shrink-0">
         <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-800 border border-slate-200">
-          Logged in
+          Logged in as: <strong class="ml-1 text-slate-900" id="session-username">@loading...</strong>
         </span>
         <a href="../backend/logout.php" class="rounded-lg bg-white border border-slate-200 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm">
           Sign Out
@@ -120,6 +120,25 @@
     </div>
     
   </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Initial setup sequence running concurrent endpoint checks
+        syncUserProfile();        
+    });
+
+    // Retrieves current username from session
+    async function syncUserProfile() {
+        try {
+            const res = await fetch("../backend/get_profile.php");
+            if (!res.ok) { window.location.href = "login.html"; return; }
+            const data = await res.json();
+            document.getElementById("session-username").textContent = `@${escapeHtml(data.username)}`;
+        } catch (err) {
+            console.error("Profile payload sync drop:", err);
+        }
+    }
+  </script>
 
 </body>
 </html>
